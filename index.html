@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixora - Telegram Photo Gallery</title>
+    <!-- CRITICAL FIX: Telegram Login Widget Script, pointing to live Render URL -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22" 
+            data-telegram-login="PixoraLoginBot" 
+            data-size="large" 
+            data-auth-url="https://pixora-backend-0lhr.onrender.com/api/auth/telegram" 
+            data-request-access="write"></script>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,6 +39,12 @@
             background-color: #414168;
             border: 1px solid #6a6a9b;
             color: white;
+        }
+        /* Style for the Telegram Widget container */
+        .telegram-widget-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 1rem;
         }
     </style>
 </head>
@@ -78,11 +90,7 @@
                     <p class="text-sm text-gray-400 mb-3">Or, link and log in instantly:</p>
                     <!-- TELEGRAM WIDGET IS NOW HERE (Final Location) -->
                     <div id="telegram-login-placeholder" class="flex justify-center">
-                        <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                                data-telegram-login="PixoraLoginBot" 
-                                data-size="large" 
-                                data-auth-url="https://pixora-backend-0lhr.onrender.com/api/auth/telegram" 
-                                data-request-access="write"></script>
+                        <!-- Widget rendered via script in <head> -->
                     </div>
                 </div>
             </section>
@@ -93,7 +101,7 @@
                 <!-- Linking & Upload Panel -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <!-- Telegram Status Card -->
-                    <div id="telegram-status-card" class="card p-6 flex flex-col justify-between lg:col-span-1">
+                    <div id="telegram-status-card" class="card p-6 flex flex-col justify-between lg:col-span-1 border border-transparent">
                         <div class="flex items-center space-x-3 mb-4">
                             <span id="link-icon"></span>
                             <h3 class="text-xl font-semibold">Telegram Status</h3>
@@ -101,6 +109,10 @@
                         <p id="link-message" class="text-gray-400 mb-4">
                             Checking connection status...
                         </p>
+                        <!-- Widget Placeholder for the NOT LINKED state -->
+                        <div id="status-widget-container" class="telegram-widget-container">
+                            <!-- Button renders here if status is not linked -->
+                        </div>
                     </div>
 
                     <!-- Upload Panel -->
@@ -165,6 +177,8 @@
             const emptyState = document.getElementById('empty-state');
             const messageBox = document.getElementById('message-box');
             const loadingIndicator = document.getElementById('loading');
+            const statusWidgetContainer = document.getElementById('status-widget-container'); // NEW
+
             
             let isSignUp = true;
             let telegramLinked = false;
@@ -273,21 +287,29 @@
 
             /** Updates UI elements based on the link status */
             function updateLinkStatusUI(linked) {
+                // Clear the widget container every time to prevent duplication
+                statusWidgetContainer.innerHTML = '';
+
                 if (linked) {
                     telegramStatusCard.classList.remove('bg-red-700/30', 'border-red-500');
                     telegramStatusCard.classList.add('bg-green-700/30', 'border-green-500');
                     linkIcon.innerHTML = lucide.createIcons()['check-circle'].toSvg({ class: 'w-6 h-6 text-green-400' });
                     linkMessage.textContent = "✅ Account is securely linked via Telegram Login.";
-                    // Hide the manual button elements
-                    document.getElementById('telegram-login-placeholder').style.display = 'none';
                     uploadPanel.classList.remove('hidden');
                 } else {
                     telegramStatusCard.classList.remove('bg-green-700/30', 'border-green-500');
                     telegramStatusCard.classList.add('bg-red-700/30', 'border-red-500');
                     linkIcon.innerHTML = lucide.createIcons()['x-octagon'].toSvg({ class: 'w-6 h-6 text-red-400' });
-                    linkMessage.textContent = "❌ Not linked. Please click the 'Login with Telegram' button below.";
-                    // Show the widget button
-                    document.getElementById('link-telegram-placeholder').style.display = 'block';
+                    linkMessage.textContent = "❌ Not linked. Please use the button below to link your account.";
+                    
+                    // Inject the Telegram Login Button directly into the status card
+                    statusWidgetContainer.innerHTML = `
+                        <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                                data-telegram-login="PixoraLoginBot" 
+                                data-size="large" 
+                                data-auth-url="${RENDER_URL}/api/auth/telegram" 
+                                data-request-access="write"></script>
+                    `;
                     uploadPanel.classList.add('hidden');
                 }
             }
