@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixora - Telegram Photo Gallery</title>
-    <!-- CRITICAL FIX: Telegram Login Widget Script -->
+    <!-- CRITICAL FIX: Telegram Login Widget Script, pointing to live Render URL -->
     <script async src="https://telegram.org/js/telegram-widget.js?22" 
             data-telegram-login="PixoraLoginBot" 
             data-size="large" 
@@ -50,8 +50,7 @@
                 <span class="text-2xl font-bold text-pink-400">Pixora</span>
             </div>
             <div id="auth-controls" class="space-x-4 flex items-center">
-                <!-- User/Logout buttons will be inserted here -->
-            </div>
+                </div>
         </div>
     </header>
 
@@ -85,7 +84,7 @@
                     <p class="text-sm text-gray-400 mb-3">Or, link and log in instantly:</p>
                     <!-- Telegram Login Widget Placeholder -->
                     <div id="telegram-login-placeholder" class="flex justify-center">
-                        <!-- Widget script loaded in <head> will render here -->
+                        <!-- Widget rendered via script in <head> -->
                     </div>
                 </div>
             </section>
@@ -119,12 +118,10 @@
                     </div>
                 </div>
 
-                <!-- Gallery Section -->
                 <h2 class="text-3xl font-bold mb-6 text-pink-400">Your Files</h2>
                 <div id="gallery-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     </div>
                 
-                <!-- Empty Gallery State -->
                 <div id="empty-state" class="hidden text-center card p-12 mt-10">
                     <span data-lucide="folder-open" class="w-16 h-16 mx-auto text-gray-500 mb-4"></span>
                     <p class="text-xl text-gray-400">No files uploaded yet. Link your account with Telegram Login above!</p>
@@ -134,12 +131,11 @@
         </div>
     </main>
 
-    <!-- The core application script -->
     <script type="module">
         // Import Supabase Client from CDN
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // Wrap the entire module script in an IIFE for robustness against truncation errors
+        // Wrap the entire module script in an IIFE for robustness
         (() => {
             // --- Supabase and Environment Setup ---
             const SUPABASE_URL = "https://wzxznrkmsgqabijkrrai.supabase.co";
@@ -226,13 +222,6 @@
 
                 authView.classList.toggle('hidden', isLoggedIn);
                 dashboardView.classList.toggle('hidden', !isLoggedIn);
-
-                // Re-render the Telegram Widget if needed
-                if (!isLoggedIn) {
-                     // The widget script loaded in <head> will render the button automatically
-                     // We just ensure the placeholder is empty here for cleanliness.
-                     document.getElementById('telegram-login-placeholder').innerHTML = '';
-                }
 
                 if (isLoggedIn) {
                     // Render user info and logout button
