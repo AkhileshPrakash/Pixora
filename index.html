@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixora - Telegram Photo Gallery</title>
-    <!-- CRITICAL FIX: Telegram Login Widget Script, pointing to live Render URL -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22" 
-            data-telegram-login="PixoraLoginBot" 
-            data-size="large" 
-            data-auth-url="https://pixora-backend-0lhr.onrender.com/api/auth/telegram" 
-            data-request-access="write"></script>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -82,9 +76,13 @@
                 
                 <div class="my-6 border-t border-gray-600/50 pt-6 text-center">
                     <p class="text-sm text-gray-400 mb-3">Or, link and log in instantly:</p>
-                    <!-- Telegram Login Widget Placeholder -->
+                    <!-- TELEGRAM WIDGET IS NOW HERE (Final Location) -->
                     <div id="telegram-login-placeholder" class="flex justify-center">
-                        <!-- Widget rendered via script in <head> -->
+                        <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                                data-telegram-login="PixoraLoginBot" 
+                                data-size="large" 
+                                data-auth-url="https://pixora-backend-0lhr.onrender.com/api/auth/telegram" 
+                                data-request-access="write"></script>
                     </div>
                 </div>
             </section>
@@ -281,7 +279,7 @@
                     linkIcon.innerHTML = lucide.createIcons()['check-circle'].toSvg({ class: 'w-6 h-6 text-green-400' });
                     linkMessage.textContent = "✅ Account is securely linked via Telegram Login.";
                     // Hide the manual button elements
-                    document.getElementById('link-telegram-btn').style.display = 'none';
+                    document.getElementById('telegram-login-placeholder').style.display = 'none';
                     uploadPanel.classList.remove('hidden');
                 } else {
                     telegramStatusCard.classList.remove('bg-green-700/30', 'border-green-500');
@@ -289,7 +287,7 @@
                     linkIcon.innerHTML = lucide.createIcons()['x-octagon'].toSvg({ class: 'w-6 h-6 text-red-400' });
                     linkMessage.textContent = "❌ Not linked. Please click the 'Login with Telegram' button below.";
                     // Show the widget button
-                    document.getElementById('link-telegram-btn').style.display = 'block';
+                    document.getElementById('link-telegram-placeholder').style.display = 'block';
                     uploadPanel.classList.add('hidden');
                 }
             }
