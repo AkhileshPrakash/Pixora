@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixora - Telegram Photo Gallery</title>
     
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* Custom styles for aesthetic */
@@ -37,7 +35,6 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Main Header -->
     <header class="bg-gray-800/50 backdrop-blur-sm shadow-lg p-4 sticky top-0 z-10">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
@@ -48,10 +45,8 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="flex-grow p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
-            <!-- Loading Indicator -->
             <div id="loading" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center">
                 <div class="text-xl font-semibold flex flex-col items-center">
                     <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-pink-500 mb-4"></div>
@@ -59,10 +54,8 @@
                 </div>
             </div>
 
-            <!-- Notification/Message Box -->
             <div id="message-box" class="hidden fixed top-20 right-4 p-4 card text-sm shadow-2xl z-50 transform transition-transform duration-300 translate-x-full"></div>
             
-            <!-- Auth View -->
             <section id="auth-view" class="max-w-md mx-auto card p-6 mt-10">
                 <h2 class="text-2xl font-semibold mb-6 text-center text-pink-400">Welcome to Pixora</h2>
                 <form id="auth-form" class="space-y-4">
@@ -76,7 +69,6 @@
                 
                 <div class="my-6 border-t border-gray-600/50 pt-6 text-center">
                     <p class="text-sm text-gray-400 mb-3">Or, link and log in instantly:</p>
-                    <!-- TELEGRAM WIDGET IS NOW HERE (Final Location) -->
                     <div id="telegram-login-placeholder" class="flex justify-center">
                         <script async src="https://telegram.org/js/telegram-widget.js?22" 
                                 data-telegram-login="PixoraLoginBot" 
@@ -87,13 +79,10 @@
                 </div>
             </section>
 
-            <!-- Dashboard View -->
             <section id="dashboard-view" class="hidden">
                 
-                <!-- Linking & Upload Panel -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- Telegram Status Card -->
-                    <div id="telegram-status-card" class="card p-6 flex flex-col justify-between lg:col-span-1">
+                    <div id="telegram-status-card" class="card p-6 flex flex-col justify-between lg:col-span-1 border-2">
                         <div class="flex items-center space-x-3 mb-4">
                             <span id="link-icon"></span>
                             <h3 class="text-xl font-semibold">Telegram Status</h3>
@@ -101,9 +90,16 @@
                         <p id="link-message" class="text-gray-400 mb-4">
                             Checking connection status...
                         </p>
-                    </div>
+                        
+                        <div id="link-telegram-placeholder" class="flex justify-center mt-4">
+                            <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                                data-telegram-login="PixoraLoginBot" 
+                                data-size="large" 
+                                data-auth-url="https://pixora-backend-0lhr.onrender.com/api/auth/telegram" 
+                                data-request-access="write"></script>
+                        </div>
+                        </div>
 
-                    <!-- Upload Panel -->
                     <div id="upload-panel" class="card p-6 lg:col-span-2 hidden">
                         <h3 class="text-xl font-semibold mb-4">Upload Files</h3>
                         <form id="upload-form" class="space-y-4">
@@ -118,7 +114,7 @@
 
                 <h2 class="text-3xl font-bold mb-6 text-pink-400">Your Files</h2>
                 <div id="gallery-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    </div>
+                </div>
                 
                 <div id="empty-state" class="hidden text-center card p-12 mt-10">
                     <span data-lucide="folder-open" class="w-16 h-16 mx-auto text-gray-500 mb-4"></span>
@@ -158,6 +154,8 @@
             const telegramStatusCard = document.getElementById('telegram-status-card');
             const linkIcon = document.getElementById('link-icon');
             const linkMessage = document.getElementById('link-message');
+            // ADDED THIS ELEMENT REFERENCE FOR THE MOVED WIDGET
+            const linkTelegramPlaceholder = document.getElementById('link-telegram-placeholder');
             const uploadPanel = document.getElementById('upload-panel');
             const uploadForm = document.getElementById('upload-form');
             const fileInput = document.getElementById('file-input');
@@ -237,6 +235,7 @@
                     fetchGallery(); // Fetch gallery data
                 } else {
                     authControls.innerHTML = '';
+                    // Ensure the widget is visible on the auth page if needed, but it's handled by default HTML visibility
                 }
             }
 
@@ -278,16 +277,18 @@
                     telegramStatusCard.classList.add('bg-green-700/30', 'border-green-500');
                     linkIcon.innerHTML = lucide.createIcons()['check-circle'].toSvg({ class: 'w-6 h-6 text-green-400' });
                     linkMessage.textContent = "✅ Account is securely linked via Telegram Login.";
-                    // Hide the manual button elements
-                    document.getElementById('telegram-login-placeholder').style.display = 'none';
+                    
+                    // Hide the widget when linked
+                    linkTelegramPlaceholder.classList.add('hidden');
                     uploadPanel.classList.remove('hidden');
                 } else {
                     telegramStatusCard.classList.remove('bg-green-700/30', 'border-green-500');
                     telegramStatusCard.classList.add('bg-red-700/30', 'border-red-500');
                     linkIcon.innerHTML = lucide.createIcons()['x-octagon'].toSvg({ class: 'w-6 h-6 text-red-400' });
                     linkMessage.textContent = "❌ Not linked. Please click the 'Login with Telegram' button below.";
-                    // Show the widget button
-                    document.getElementById('link-telegram-placeholder').style.display = 'block';
+                    
+                    // Show the widget when not linked
+                    linkTelegramPlaceholder.classList.remove('hidden');
                     uploadPanel.classList.add('hidden');
                 }
             }
